@@ -2,25 +2,51 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Request;
 use App\Models\Student;
 use Illuminate\Support\Facades\Log;
 use App\Facades\StudentFacade;
+use Inertia\Inertia;
 
 class StudentController extends Controller
 {
-    public function index(){
+
+    public function index()
+    {
+        $studentsData = [];
         $students = Student::all();
-        return view('students.index', ['students' => $students]);
-        
+    
+        foreach ($students as $student) {
+            $studentsData[] = [
+                'id'  => $student->id,
+                'studentId' => $student->studentId,
+                'name' => $student->name,
+                'age' => $student->age,
+                'status' => $student->status,
+                'image' => $student->image,
+            ];
+        }
+    Log::info($studentsData);
+        return Inertia::render('Student/Index', [
+            'students' => $studentsData,
+        ]);
     }
 
-    public function create(){
-        return view('students.create');
+    // public function create(){
+    //     return view('students.create');
+    // }
+    public function create()
+    {
+        return inertia('Student/Create');
     }
 
     public function store(Request $request){
-        Log::info($request);
+        // Log specific data from the request
+        Log::info('Request data:', $request->all());
+    
+        // Validate the request data
         $validatedData = $request->validate([
             'studentId' => 'required|unique:students',
             'name' => 'required',
@@ -44,20 +70,24 @@ class StudentController extends Controller
             // Update the validated data with the image filename
             $validatedData['image'] = $filename;
         }
-        Log::info("hj",$validatedData);
+    
         // Create a new student record in the database
         $newStudent = StudentFacade::addStudent($validatedData);
-     
-
+    
         return redirect(route('student.index'));
-
     }
+    
 
-    public function edit(Student $student){
-        return view('students.edit', ['student' => $student]);
+    // public function edit(Student $student){
+    //     return view('students.edit', ['student' => $student]);
+    // }
+    public function edit(Student $student)
+    {   
+        return Inertia::render('Student/Edit', ['student' => $student]);
     }
 
     public function update(Student $student, Request $request){
+        Log::info($student);
         $validatedData = $request->validate([
             'studentId' => 'required|unique:students,studentId,'.$student->id,
             'name' => 'required',
