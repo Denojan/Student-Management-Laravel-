@@ -1,12 +1,11 @@
 import { createApp, h } from 'vue'
-import { InertiaProgress } from '@inertiajs/progress'
-import { createInertiaApp } from '@inertiajs/inertia-vue3'
-
-InertiaProgress.init()
+import { createInertiaApp } from '@inertiajs/vue3'
 
 createInertiaApp({
-  resolve: name => require(`./Pages/${name}`),
-  title: title => title ? `${title} - Ping CRM` : 'Ping CRM',
+  resolve: name => {
+    const pages = import.meta.glob('./Pages/**/*.vue', { eager: true })
+    return pages[`./Pages/${name}.vue`]
+  },
   setup({ el, App, props, plugin }) {
     createApp({ render: () => h(App, props) })
       .use(plugin)

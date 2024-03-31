@@ -1,5 +1,6 @@
 <?php
-
+use Illuminate\Contracts\Http\Kernel as KernelContract;
+use Illuminate\Contracts\Routing\Registrar as Middleware;
 /*
 |--------------------------------------------------------------------------
 | Create The Application
