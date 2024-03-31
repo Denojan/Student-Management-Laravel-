@@ -2,17 +2,38 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Request;
 use App\Models\Student;
 use Illuminate\Support\Facades\Log;
 use App\Facades\StudentFacade;
+use Inertia\Inertia;
 
 class StudentController extends Controller
 {
-    public function index(){
-        $students = Student::all();
-        return view('students.index', ['students' => $students]);
+    // public function index(){
+    //     $students = Student::all();
+    //     return view('students.index', ['students' => $students]);
         
+    // }
+    public function index()
+    {
+        $studentsData = [];
+        $students = Student::all();
+    
+        foreach ($students as $student) {
+            $studentsData[] = [
+                'studentId' => $student->studentId,
+                'name' => $student->name,
+                'age' => $student->age,
+                'status' => $student->status,
+            ];
+        }
+    Log::info($studentsData);
+        return Inertia::render('Student/Index', [
+            'students' => $studentsData,
+        ]);
     }
 
     public function create(){
