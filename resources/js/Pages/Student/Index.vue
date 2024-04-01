@@ -2,7 +2,10 @@
   <div>
     <h1 class="mb-8 text-3xl font-bold">All Student</h1>
     <div>
-      
+      <div v-if="successMessage" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+        <strong class="font-bold">Success!</strong>
+        <span class="block sm:inline">{{ successMessage }}</span>
+      </div>
       <Link href="/student/create" method="get" as="button">Create a student</Link>
     </div>
     <div v-if="students.length > 0">
@@ -49,6 +52,7 @@
 import { Head, Link } from '@inertiajs/inertia-vue3'
 import { useRoute } from 'vue-router'; 
 import axios from 'axios';
+import { ref } from 'vue';
 export default {
   components: {
     Head,
@@ -63,9 +67,11 @@ export default {
   setup() {
     
     const route = useRoute(); 
+    const successMessage = ref(null);
     const deleteStudent = async (studentId) => {
       try {
         await axios.delete(`/student/${studentId}/destroy`);
+        successMessage.value = 'Student deleted successfully';
         console.log('Student deleted successfully');
        
       } catch (error) {
@@ -76,7 +82,7 @@ export default {
       return `/student/${Id}/edit`; 
     };
 
-    return { editStudentRoute, deleteStudent };
+    return { editStudentRoute, deleteStudent, successMessage };
   },
 };
 </script>

@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Request;
+
 use App\Models\Student;
 use Illuminate\Support\Facades\Log;
 use App\Facades\StudentFacade;
 use Inertia\Inertia;
-
+use Illuminate\Http\Request;
 class StudentController extends Controller
 {
 
@@ -34,12 +34,10 @@ class StudentController extends Controller
         ]);
     }
 
-    // public function create(){
-    //     return view('students.create');
-    // }
-    public function create()
-    {
-        return inertia('Student/Create');
+    
+   
+    public function create(){
+        return view('students.create');
     }
 
     public function store(Request $request){
@@ -78,18 +76,21 @@ class StudentController extends Controller
     }
     
 
-    // public function edit(Student $student){
-    //     return view('students.edit', ['student' => $student]);
-    // }
-    public function edit(Student $student)
-    {   
-        return Inertia::render('Student/Edit', ['student' => $student]);
+    public function edit(Student $student){
+        return view('students.edit', ['student' => $student]);
     }
+    // public function edit(Student $student)
+    // {   
+    //     return Inertia::render('Student/Edit', ['student' => $student]);
+    // }
 
-    public function update(Student $student, Request $request){
+    public function update(Student $student, Request $request) {
+        // Log the student
         Log::info($student);
+    
+        // Validate the request data
         $validatedData = $request->validate([
-            'studentId' => 'required|unique:students,studentId,'.$student->id,
+            'studentId' => 'required|unique:students,studentId,' . $student->studentId,
             'name' => 'required',
             'age' => 'required|integer',
             'image' => 'nullable|image|max:2048',
@@ -111,15 +112,17 @@ class StudentController extends Controller
             $validatedData['image'] = $filename;
         }
     
-       // $student->update($validatedData);
-       StudentFacade::updateStudent($student, $validatedData);
+        // Update the student using the StudentFacade
+        StudentFacade::updateStudent($student, $validatedData);
+    
+        // Redirect back with success message
         return redirect(route('student.index'))->with('success', 'Student Updated Successfully');
     }
     
 
     public function destroy(Student $student){
-       // $student->delete();
+       
        StudentFacade::deleteStudent($student);
-        return redirect(route('student.index'))->with('success', 'Student deleted Succesffully');
+        return view('students.index')->with('success', 'Student deleted Succesffully');
     }
 }
